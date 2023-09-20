@@ -103,14 +103,14 @@ Note: Most starter Capacitor projects are preconfigured to load `google-services
 ### detectText(...)
 
 ```typescript
-detectText(options: DetectTextOptions) => Promise<TextDetections>
+detectText(options: DetectTextFileOptions | DetectTextBase64Options) => Promise<TextDetections>
 ```
 
 Detect text in an image
 
-| Param         | Type                                                            | Description                |
-| ------------- | --------------------------------------------------------------- | -------------------------- |
-| **`options`** | <code><a href="#detecttextoptions">DetectTextOptions</a></code> | Options for text detection |
+| Param         | Type                                                                                                                                      | Description                |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| **`options`** | <code><a href="#detecttextfileoptions">DetectTextFileOptions</a> \| <a href="#detecttextbase64options">DetectTextBase64Options</a></code> | Options for text detection |
 
 **Returns:** <code>Promise&lt;<a href="#textdetections">TextDetections</a>&gt;</code>
 
@@ -138,11 +138,19 @@ Detect text in an image
 | **`text`**        | <code>string</code>           |
 
 
-#### DetectTextOptions
+#### DetectTextFileOptions
 
 | Prop              | Type                                                          |
 | ----------------- | ------------------------------------------------------------- |
 | **`filename`**    | <code>string</code>                                           |
+| **`orientation`** | <code><a href="#imageorientation">ImageOrientation</a></code> |
+
+
+#### DetectTextBase64Options
+
+| Prop              | Type                                                          |
+| ----------------- | ------------------------------------------------------------- |
+| **`base64`**      | <code>string</code>                                           |
 | **`orientation`** | <code><a href="#imageorientation">ImageOrientation</a></code> |
 
 
