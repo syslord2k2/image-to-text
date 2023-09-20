@@ -9,26 +9,30 @@ import Capacitor
 @objc(CapacitorOcr)
 public class CapacitorOcr: CAPPlugin {
     @objc func detectText(_ call: CAPPluginCall) {
-        guard var filename = call.getString("filename") else {
-            call.reject("file not found")
-            return
-        }
+        if let filename = call.getString("filename") {
+            let filePath = String(filename.dropFirst(7))
 
-        // removeFirst(7) removes the initial "file://"
-        if (filename.hasPrefix("file://")) {
-            filename.removeFirst(7)
-            guard let image = UIImage(contentsOfFile: filename) else {
-                call.reject("file does not contain an image")
+            guard let image = UIImage(contentsOfFile: filePath) else {
+                call.reject("Could not load image from path")
+                return;
+            }
+
+            TextDetector(call: call, image: image).detectText()
+
+        } else if var base64 = call.getString("base64") {
+            if let prefixRange = base64.range(of: "base64,") {
+                base64 = String(base64[prefixRange.upperBound...])
+            }
+
+            guard let data = Data(base64Encoded: base64), let image = UIImage(data: data) else {
+                call.reject("Could not load image from base64")
                 return
             }
+
             TextDetector(call: call, image: image).detectText()
-        } else { // not a file
-            let dataDecoded : Data = Data(base64Encoded: filename, options: .ignoreUnknownCharacters)!
-            guard let image = UIImage(data: dataDecoded) else {
-                call.reject("not valid image data")
-                return
-            }
-            TextDetector(call: call, image: image).detectText()
+
+        } else {
+            call.reject("Invalid image input")
         }
     }
 }
@@ -101,7 +105,6 @@ public class TextDetector {
             }
 
             self.detectedText = results.map {[
-                "topLeft": [Double($0.topLeft.x), Double($0.topLeft.y)] as [Double],
                 "topRight": [Double($0.topRight.x), Double($0.topRight.y)] as [Double],
                 "bottomLeft": [Double($0.bottomLeft.x), Double($0.bottomLeft.y)] as [Double],
                 "bottomRight": [Double($0.bottomRight.x), Double($0.bottomRight.y)] as [Double],
