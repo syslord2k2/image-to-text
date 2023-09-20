@@ -28,8 +28,14 @@ public class CapacitorOcr extends Plugin {
         }
 
         int rotation = this.orientationToRotation(orientation);
+        Bitmap bitmap = null;
 
-        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContext().getContentResolver(), Uri.parse(filename));
+        if (filename.startsWith("file://")) {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContext().getContentResolver(), Uri.parse(filename));
+        } else {
+            byte[] decodedString = Base64.decode(filename, Base64.DEFAULT);
+            bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        }
         if (bitmap == null) {
             call.reject("Could not load image from path");
             return;

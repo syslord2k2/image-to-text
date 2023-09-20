@@ -15,12 +15,21 @@ public class CapacitorOcr: CAPPlugin {
         }
 
         // removeFirst(7) removes the initial "file://"
-        filename.removeFirst(7)
-        guard let image = UIImage(contentsOfFile: filename) else {
-            call.reject("file does not contain an image")
-            return
+        if (filename.hasPrefix("file://")) {
+            filename.removeFirst(7)
+            guard let image = UIImage(contentsOfFile: filename) else {
+                call.reject("file does not contain an image")
+                return
+            }
+            TextDetector(call: call, image: image).detectText()
+        } else { // not a file
+            let dataDecoded : Data = Data(base64Encoded: filename, options: .ignoreUnknownCharacters)!
+            guard let image = UIImage(data: dataDecoded) else {
+                call.reject("not valid image data")
+                return
+            }
+            TextDetector(call: call, image: image).detectText()
         }
-        TextDetector(call: call, image: image).detectText()
     }
 }
 
